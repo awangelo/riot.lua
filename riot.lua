@@ -119,23 +119,6 @@ local function handle_viewmodel()
     set_viewmodel(offset_fov, offset_x, offset_y, offset_z)
 end
 
-local function handle_autobuy()
-    local selected_option = ui.get(menu.autobuy)
-
-    if selected_option == "off" then
-        return
-    elseif selected_option == "auto" then
-        client.exec(
-            "buy g3sg1; buy scar20; buy deagle; buy revolver; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser 34; buy vesthelm;")
-    elseif selected_option == "awp" then
-        client.exec(
-            "buy awp; buy deagle; buy revolver; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser 34; buy vesthelm;")
-    elseif selected_option == "scout" then
-        client.exec(
-            "buy ssg08; buy deagle; buy revolver; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser 34; buy vesthelm;")
-    end
-end
-
 local function handle_viewmodel_toggle()
     local enabled = ui.get(menu.viewmodel_changer)
     ui.set_visible(menu.viewmodel_fov, enabled)
@@ -148,6 +131,37 @@ local function handle_viewmodel_toggle()
     else
         handle_viewmodel()
     end
+end
+
+local function buy(command)
+    client.exec(command)
+end
+
+local function handle_autobuy()
+    local selected_option = ui.get(menu.autobuy)
+    if selected_option == "off" then
+        return
+    end
+
+    local command = ""
+    if selected_option == "auto" then
+        command =
+        "buy g3sg1; buy scar20; buy deagle; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
+    elseif selected_option == "awp" then
+        command =
+        "buy awp; buy deagle; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
+    elseif selected_option == "scout" then
+        command =
+        "buy ssg08; buy deagle; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
+    end
+
+    -- Calculate delay based on latency
+    local delay = 0.3 - client.latency() + 0.1
+
+    -- Schedule multiple buy attempts
+    client.delay_call(delay, buy, command)
+    client.delay_call(delay + 0.1, buy, command)
+    client.delay_call(delay + 0.2, buy, command)
 end
 
 
