@@ -7,3 +7,6 @@ Simple visuals/misc gamesense lua for csgo.
 - Aspect Ratio
 - Thirdperson Distance
 - Viewmodel FOV, X, Y, Z
+
+[api docs](https://docs.gamesense.gs/)
+[luas](https://github.com/sapphyrus/gamesense-lua)
