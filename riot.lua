@@ -27,8 +27,14 @@ local default_thirdperson = 115
 local colors = {
     blue = "\a5bcefaFF",
     pink = "\af5a9b8FF",
-    white = "\affffffFF"
+    white = "\affffffFF",
+    blue_rgb = { 91, 206, 250 },
+    pink_rgb = { 245, 169, 184 },
+    white_rgb = { 255, 255, 255 }
 }
+
+local hitgroup_names = { "generic", "head", "chest", "stomach", "left arm", "right arm", "left leg", "right leg",
+    "neck", "?", "gear" }
 
 local tab_names = {
     info = colors.white .. "Info",
@@ -67,7 +73,8 @@ local menu = {
     viewmodel_offset_x  = ui_new_slider("LUA", "A", "Offset x", -200, 200, default_offset_x, true, nil, 0.1),
     viewmodel_offset_y  = ui_new_slider("LUA", "A", "Offset y", -100, 300, default_offset_y, true, nil, 0.1),
     viewmodel_offset_z  = ui_new_slider("LUA", "A", "Offset z", -100, 300, default_offset_z, true, nil, 0.1),
-    autobuy             = ui_new_combobox("LUA", "A", "Auto buy", { "off", "auto", "awp", "scout" })
+    autobuy             = ui_new_combobox("LUA", "A", "Auto buy", { "off", "auto", "awp", "scout" }),
+    log_missed_shots    = ui_new_checkbox("LUA", "A", "Log misses")
 }
 
 
@@ -180,6 +187,36 @@ local function handle_autobuy()
     client_delay_call(delay + 0.2, buy, command)
 end
 
+local function aim_miss(e)
+    local group = hitgroup_names[e.hitgroup + 1] or "?"
+
+    -- Prefixo da lua
+    client_color_log(colors.pink_rgb[1], colors.pink_rgb[2], colors.pink_rgb[3], "[\0")
+    client_color_log(colors.blue_rgb[1], colors.blue_rgb[2], colors.blue_rgb[3], "riot\0")
+    client_color_log(colors.pink_rgb[1], colors.pink_rgb[2], colors.pink_rgb[3], "] \0")
+
+    -- Nome do player
+    client_color_log(colors.white_rgb[1], colors.white_rgb[2], colors.white_rgb[3], "missed \0")
+    client_color_log(colors.blue_rgb[1], colors.blue_rgb[2], colors.blue_rgb[3], entity_get_player_name(e.target), " \0")
+
+    -- Hit group
+    client_color_log(colors.pink_rgb[1], colors.pink_rgb[2], colors.pink_rgb[3], "(", group, ") \0")
+
+    -- Reason
+    client_color_log(colors.white_rgb[1], colors.white_rgb[2], colors.white_rgb[3], "due to \0")
+    client_color_log(colors.pink_rgb[1], colors.pink_rgb[2], colors.pink_rgb[3], e.reason)
+end
+
+local function handle_missed_shots()
+    local enabled = ui_get(menu.log_missed_shots)
+
+    if enabled then
+        client_set_event_callback("aim_miss", aim_miss)
+    else
+        client_unset_event_callback("aim_miss", aim_miss)
+    end
+end
+
 
 --
 -- Menu
@@ -216,6 +253,8 @@ local function update_visibility(selected_tab)
         ui_set_visible(menu.viewmodel_offset_z, viewmodel_enabled)
     elseif selected_tab == tab_names.misc then
         ui_set_visible(menu.autobuy, true)
+
+        ui_set_visible(menu.log_missed_shots, true)
     end
 end
 
@@ -236,6 +275,8 @@ local function init_menu()
     ui_set_callback(menu.viewmodel_offset_x, handle_viewmodel)
     ui_set_callback(menu.viewmodel_offset_y, handle_viewmodel)
     ui_set_callback(menu.viewmodel_offset_z, handle_viewmodel)
+
+    ui_set_callback(menu.log_missed_shots, handle_missed_shots)
 
     -- Callback para mudanca de tab
     ui_set_callback(menu_tabs, function()
