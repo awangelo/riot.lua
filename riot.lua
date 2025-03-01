@@ -47,7 +47,7 @@ local menu_tabs = ui_new_combobox("LUA", "A",
 -- Items do menu
 --
 
-ui_new_label(colors.white .. "                . ݁₊ ⊹ . ݁ ⟡ ݁ . ⊹ ₊ ݁.")
+ui_new_label("LUA", "A", colors.white .. "                . ݁₊ ⊹ . ݁ ⟡ ݁ . ⊹ ₊ ݁.")
 ui_new_label("LUA", "A", " ")
 
 local menu = {
@@ -96,11 +96,11 @@ end
 local function set_thirdperson()
     local enabled = ui_get(menu.thirdperson_toggle)
     if not enabled then
-        cvar["cam_idealdist"].set_int(default_thirdperson)
+        cvar["cam_idealdist"]:set_int(default_thirdperson)
         return
     end
 
-    cvar["cam_idealdist"].set_int(ui_get(menu.thirdperson_slider))
+    cvar["cam_idealdist"]:set_int(ui_get(menu.thirdperson_slider))
 end
 
 local function set_viewmodel(fov, x, y, z)
