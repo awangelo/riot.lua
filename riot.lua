@@ -166,16 +166,22 @@ local function handle_autobuy()
         return
     end
 
+    local local_player = entity_get_local_player()
+    local money = entity_get_prop(local_player, "m_iAccount")
+    if money <= 800 then
+        return
+    end
+
     local command = ""
     if selected_option == "auto" then
         command =
-        "buy g3sg1; buy scar20; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
+        "buy g3sg1; buy scar20; buy deagle; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
     elseif selected_option == "awp" then
         command =
-        "buy awp; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
+        "buy awp; buy deagle; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
     elseif selected_option == "scout" then
         command =
-        "buy ssg08; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
+        "buy ssg08; buy deagle; buy smokegrenade; buy hegrenade; buy molotov; buy incgrenade; buy defuser; buy taser; buy vesthelm;"
     end
 
     -- Calculate delay based on latency
