@@ -17,7 +17,6 @@ local ipairs, assert, pairs, next, tostring, tonumber, setmetatable, unpack, typ
 
 local message             = "live laugh lain"
 local is_first_load       = true
-local current_tab         = nil
 local default_fov         = 680
 local default_offset_x    = 25
 local default_offset_y    = 0
@@ -75,6 +74,22 @@ local menu = {
     viewmodel_offset_z  = ui_new_slider("LUA", "A", "Offset z", -100, 300, default_offset_z, true, nil, 0.1),
     autobuy             = ui_new_combobox("LUA", "A", "Auto buy", { "off", "auto", "awp", "scout" }),
     log_missed_shots    = ui_new_checkbox("LUA", "A", "Log misses")
+}
+
+local tab_groups = {
+    [tab_names.info] = {
+        menu.info_message
+    },
+    [tab_names.visuals] = {
+        menu.aspect_ratio_toggle, menu.aspect_ratio_slider,
+        menu.thirdperson_toggle, menu.thirdperson_slider,
+        menu.viewmodel_changer, menu.viewmodel_fov,
+        menu.viewmodel_offset_x, menu.viewmodel_offset_y,
+        menu.viewmodel_offset_z
+    },
+    [tab_names.misc] = {
+        menu.autobuy, menu.log_missed_shots
+    }
 }
 
 
@@ -168,7 +183,7 @@ local function handle_autobuy()
 
     local local_player = entity_get_local_player()
     local money = entity_get_prop(local_player, "m_iAccount")
-    if money <= 800 then
+    if money <= 1200 then
         return
     end
 
@@ -229,38 +244,11 @@ end
 --
 
 local function update_visibility(selected_tab)
-    if current_tab == selected_tab then
-        return
-    end
-
-    current_tab = selected_tab
-
-    for _, e in pairs(menu) do
-        ui_set_visible(e, false)
-    end
-
-    if selected_tab == tab_names.info then
-        ui_set_visible(menu.info_message, true)
-    elseif selected_tab == tab_names.visuals then
-        -- Checkboxes de toggle
-        ui_set_visible(menu.aspect_ratio_toggle, true)
-        ui_set_visible(menu.thirdperson_toggle, true)
-        ui_set_visible(menu.viewmodel_changer, true)
-
-        ui_set_visible(menu.aspect_ratio_slider, ui_get(menu.aspect_ratio_toggle))
-        ui_set_visible(menu.thirdperson_slider, ui_get(menu.thirdperson_toggle))
-
-        ui_set_visible(menu.viewmodel_changer, true)
-        -- Mostra os sliders do viewmodel apenas se a feature estiver ativada
-        local viewmodel_enabled = ui_get(menu.viewmodel_changer)
-        ui_set_visible(menu.viewmodel_fov, viewmodel_enabled)
-        ui_set_visible(menu.viewmodel_offset_x, viewmodel_enabled)
-        ui_set_visible(menu.viewmodel_offset_y, viewmodel_enabled)
-        ui_set_visible(menu.viewmodel_offset_z, viewmodel_enabled)
-    elseif selected_tab == tab_names.misc then
-        ui_set_visible(menu.autobuy, true)
-
-        ui_set_visible(menu.log_missed_shots, true)
+    for tab, controls in pairs(tab_groups) do
+        local isVisible = (tab == selected_tab)
+        for _, control in ipairs(controls) do
+            ui_set_visible(control, isVisible)
+        end
     end
 end
 
